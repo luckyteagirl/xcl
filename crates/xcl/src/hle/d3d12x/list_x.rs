@@ -4422,6 +4422,7 @@ pub(super) fn mirror_pages_written(dirty: &[usize]) {
 /// Call `on_run(first, end)` for every maximal contiguous run of set bits in `bits[..]` below `n`.
 fn for_each_bitset_run(bits: &[u64], n: usize, mut on_run: impl FnMut(usize, usize)) {
     let words = n.div_ceil(64).min(bits.len());
+    let end = n.min(bits.len().saturating_mul(64));
     let mut run_start: Option<usize> = None;
     for (wi, &raw) in bits[..words].iter().enumerate() {
         let valid_bits = (n - wi * 64).min(64);
@@ -4460,7 +4461,7 @@ fn for_each_bitset_run(bits: &[u64], n: usize, mut on_run: impl FnMut(usize, usi
         let _ = &mut w;
     }
     if let Some(s) = run_start {
-        on_run(s, n);
+        on_run(s, end);
     }
 }
 
